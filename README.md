@@ -11,7 +11,7 @@ It seeks to improve the original solution accelerator by:
 
 ## Internal Architecture
 
-![alt text](./docs./images/revised-software-architecture.png "Revised software architecture")
+![alt text](./docs/images/revised-software-architecture.png "Revised software architecture")
 
 ---
 name: Chat with your data - Solution accelerator (Python)
