@@ -1,3 +1,18 @@
+# Teams-focussed chat with your data solution accelerator
+
+This repo has been forked from the main [chat with your data solution accelerator](https://github.com/Azure-Samples/chat-with-your-data-solution-accelerator/).
+
+It seeks to improve the original solution accelerator by:
+1. Make available all orchestrators to the web front end and the Teams from end
+2. Provide chat history in the Teams front end
+
+> [!CAUTION]
+> This repo is a work in progress. So do not use this repo until the changes have been completed.
+
+## Internal Architecture
+
+![alt text](./docs./images/revised-softwere-architecture.png "Revised software architecture")
+
 ---
 name: Chat with your data - Solution accelerator (Python)
 description: Chat with your data using OpenAI and AI Search with Python.
