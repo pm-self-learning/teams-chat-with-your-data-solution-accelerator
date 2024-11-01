@@ -11,6 +11,18 @@ It seeks to improve the original solution accelerator by:
 
 ## Internal Architecture
 
+There are a number of different orchestrations for requests. These are:
+
+1. function calling
+2. semantic kernel
+3. Langchain
+
+These perform a RAG process on the client-side, built on OpenAI function calling.
+
+The web application also has a "byod" (presumably bring your own data) flow in-line in the main web app. This does a server RAG process in the same way in which the chat interface in AI Studio performs RAG.
+
+The plan is to take this flow and make this as an additional orchestator that can be chosen both by the web application and the Teams application.
+
 ![alt text](./docs/images/revised-software-architecture.png "Revised software architecture")
 
 ---
