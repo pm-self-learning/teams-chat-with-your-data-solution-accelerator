@@ -15,6 +15,9 @@ jobs:
       APP_NAME: "backend-app"
       DOCKERFILE: "docker/Backend.Dockerfile"
     steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+          
         - name: Build and Push Docker Image
           uses: ./.github/workflows/teams-accelerator-build-push-docker.yml
           with:
