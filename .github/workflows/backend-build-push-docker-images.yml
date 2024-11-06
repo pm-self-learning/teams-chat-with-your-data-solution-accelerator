@@ -39,8 +39,8 @@ jobs:
           id: docker-tags
           run: |
             echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.APP_NAME }}:latest" >> $GITHUB_ENV
-            echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.APP_NAME }}:${{ steps.date.outputs.date }}_${{ github.run_number }}" >> $GITHUB_ENV
-            echo "::set-output name=custom-image-name::${{ env.APP_NAME }}:${{ steps.date.outputs.date }}_${{ github.run_number }}"
+            echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.APP_NAME }}:${{ github.run_number }}" >> $GITHUB_ENV
+            echo "::set-output name=custom-image-name::${{ env.APP_NAME }}:${{ github.run_number }}"
 
         - name: Build Docker Image and optionally push
           uses: docker/build-push-action@v6
@@ -75,7 +75,7 @@ jobs:
             az functionapp config container set \
               --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --docker-custom-image-name  ${{ needs.build-push-docker-image.outputs.custom-image-name }} \
+              --docker-custom-image-name  ${{ env.APP_NAME }}:${{ github.run_number }} \
               --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
               --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
               --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
