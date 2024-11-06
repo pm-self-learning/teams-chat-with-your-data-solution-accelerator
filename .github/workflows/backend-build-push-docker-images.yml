@@ -1,4 +1,4 @@
-name: Function App - Build and Push Docker Image
+name: Backend App - Build and Push Docker Image
 
 on:
   workflow_dispatch:
@@ -7,6 +7,7 @@ on:
       - 'backend/batch/**'
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build-push-docker-image:
