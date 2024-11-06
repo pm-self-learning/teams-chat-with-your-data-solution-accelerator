@@ -53,6 +53,9 @@ jobs:
   deploy-backend-app:
       needs: build-push-docker-image
       runs-on: ubuntu-latest
+      environment:
+        name: 'dev'
+
       steps:
         - name: Checkout code
           uses: actions/checkout@v2
