@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'backend/batch/**'
+permissions:
+  contents: read
 
 jobs:
   build-docker-image:
