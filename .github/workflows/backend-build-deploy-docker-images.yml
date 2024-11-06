@@ -18,6 +18,7 @@ jobs:
    with:
       app_name: "backend-app"
       dockerfile: "docker/Backend.Dockerfile"
+      push: true
 
 
   deploy-backend-app:
