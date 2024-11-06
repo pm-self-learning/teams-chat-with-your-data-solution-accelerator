@@ -24,4 +24,4 @@ jobs:
             app_name: ${{ env.APP_NAME }}
             dockerfile: ${{ env.DOCKERFILE }}
           #push: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' }}
-          secrets: inherit
+       
