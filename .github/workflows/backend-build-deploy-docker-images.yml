@@ -1,19 +1,31 @@
-name: Backend App - Deploy
+name: Backend App - Build and Deploy Docker Image
 
 on:
-  workflow_run:
-    workflows: [1Backend App - Build and Push Docker Image]
-
+  workflow_dispatch:
+  push:
+    paths:
+      - 'backend/batch/**'
 permissions:
   contents: read
   id-token: write
+env:
+    APP_NAME: "backend-app"
+    DOCKERFILE: "docker/Backend.Dockerfile"
 
 jobs:
-   deploy-backend-app:
+  build-push-docker-image:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/teams-accelerator-build-push-docker.yml
+    with:
+      app_name: ${{ env.APP_NAME }}
+      dockerfile: ${{ env.DOCKERFILE }}
 
+
+  deploy-backend-app:
+      needs: build-push-docker-image
       runs-on: ubuntu-latest
       environment:
-        name: 'dev'
+        name: ${{ github.ref != 'refs/heads/main' && 'dev' || 'prod' }}
 
       steps:
         - name: Checkout code
@@ -31,7 +43,7 @@ jobs:
             az functionapp config container set \
               --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --docker-custom-image-name ${{ env.VERSION_TAG }} \
+              --docker-custom-image-name  ${{ env.APP_NAME }}:${{ github.run_number }} \
               --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
               --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
               --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
