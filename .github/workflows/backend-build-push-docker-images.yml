@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  build-docker-image:
+  build-push-docker-image:
     runs-on: ubuntu-latest
     env:
       APP_NAME: "backend-app"
