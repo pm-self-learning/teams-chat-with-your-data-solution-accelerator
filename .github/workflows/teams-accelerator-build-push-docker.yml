@@ -2,7 +2,8 @@ name: Reusable Docker build and push workflow
 
 on:
   workflow_call:
-   secrets: inherit
+  
+
    inputs:
       app_name:
         required: true
