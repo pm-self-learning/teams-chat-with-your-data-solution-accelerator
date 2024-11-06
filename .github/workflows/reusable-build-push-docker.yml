@@ -2,7 +2,7 @@ name: Reusable Docker build and push workflow
 
 on:
   workflow_call:
-  
+
 
    inputs:
       app_name:
@@ -14,8 +14,6 @@ on:
       push:
         required: true
         type: boolean
-        default: true
-
 
 jobs:
   docker-build:
@@ -43,7 +41,7 @@ jobs:
           echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
 
-      - name: Build Docker Image and optionally push
+      - name: Build Docker Image and push
         uses: docker/build-push-action@v6
         with:
           context: .

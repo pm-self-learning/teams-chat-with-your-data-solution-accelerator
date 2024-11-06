@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-push-docker-image:
-   uses: ./.github/workflows/teams-accelerator-build-push-docker.yml
+   uses: ./.github/workflows/reusable-build-push-docker.yml
    with:
       app_name: "backend-app"
       dockerfile: "docker/Backend.Dockerfile"
