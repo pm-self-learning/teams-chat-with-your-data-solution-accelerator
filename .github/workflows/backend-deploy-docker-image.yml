@@ -1,0 +1,37 @@
+name: Backend App - Deploy
+
+on:
+  workflow_run:
+    workflows: [1Backend App - Build and Push Docker Image]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+   deploy-backend-app:
+
+      runs-on: ubuntu-latest
+      environment:
+        name: 'dev'
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Azure Login
+          uses: azure/login@v1
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - name: Set Azure Function App settings
+          run: |
+            az functionapp config container set \
+              --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --docker-custom-image-name ${{ env.VERSION_TAG }} \
+              --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
+              --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
+              --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
