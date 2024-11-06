@@ -9,6 +9,8 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  APP_NAME: "backend-app"
 
 jobs:
   build-push-docker-image:
