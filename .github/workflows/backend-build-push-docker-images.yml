@@ -37,9 +37,9 @@ jobs:
           uses: docker/build-push-action@v6
           with:
             context: .
-            file: ${{ inputs.dockerfile }}
-            push: ${{ inputs.push }}
-            cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name}}:latest
+            file: ${{ env.dockerfile }}
+            push: true
+            cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.app_name}}:latest
             tags: |
-              ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name}}:latest
-              ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name}}:${{ steps.date.outputs.date }}_${{ github.run_number }}
+              ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.app_name}}:latest
+              ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.app_name}}:${{ steps.date.outputs.date }}_${{ github.run_number }}
