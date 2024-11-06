@@ -1,28 +1,28 @@
-name: Backend App - Build and Deploy Docker Image
+name: Admin Frontend App - Build and Deploy Docker Image
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'backend/batch/**'
+      - 'frontend/src/**'
 permissions:
   contents: read
   id-token: write
 
 env:
-  APP_NAME: "backend-app"
+  APP_NAME: "frontend-app"
 
 jobs:
   build-push-docker-image:
-   uses: ./.github/workflows/reusable-build-push-docker.yml
+   uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
-      app_name: "backend-app"
-      dockerfile: "docker/Backend.Dockerfile"
+      app_name: "frontend-app"
+      dockerfile: "docker/Frontend.Dockerfile"
       push: true
    secrets:
       inherit
 
-  deploy-backend-app:
+  deploy-frontend-app:
       needs: build-push-docker-image
       runs-on: ubuntu-latest
       environment:
@@ -39,17 +39,10 @@ jobs:
             tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        - name: Docker Login
-          uses: docker/login-action@v3
-          with:
-            registry: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-            username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME}}
-            password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-
-        - name: Set Azure Function App container settings
+        - name: Set Admin Azure App Service container settings
           run: |
-            az functionapp config container set \
-              --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+            az webapp config container set \
+              --name ${{ secrets.AZURE_APP_SERVICE_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --docker-custom-image-name  ${{ env.APP_NAME }}:${{ github.run_number }} \
               --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
