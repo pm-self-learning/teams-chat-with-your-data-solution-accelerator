@@ -2,8 +2,6 @@ name: Reusable Docker build and push workflow
 
 on:
   workflow_call:
-
-
    inputs:
       app_name:
         required: true

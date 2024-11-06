@@ -22,7 +22,6 @@ jobs:
    secrets:
       inherit
 
-
   deploy-backend-app:
       needs: build-push-docker-image
       runs-on: ubuntu-latest
