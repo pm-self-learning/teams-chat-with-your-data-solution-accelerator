@@ -1,4 +1,4 @@
-name: Frontend App - Build and Deploy Docker Image
+name: Admin - Frontend App - Build and Deploy Docker Image
 
 on:
   workflow_dispatch:
