@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'backend/batch/**'
+      - 'code/backend/batch/**'
 permissions:
   contents: read
   id-token: write
