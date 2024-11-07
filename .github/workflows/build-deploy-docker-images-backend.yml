@@ -44,7 +44,7 @@ jobs:
             az functionapp config container set \
               --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --container-image-name  ${{ env.VERSION_TAG }}  \
+              --container-image-name  ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }} \
               --container-registry-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
               --container-registry-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
               --container-registry-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
