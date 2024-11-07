@@ -3,7 +3,7 @@ name: Reusable Docker build and push workflow
 on:
   workflow_call:
    inputs:
-      app_name:
+      image_name:
         required: true
         type: string
       dockerfile:
@@ -12,6 +12,9 @@ on:
       push:
         required: true
         type: boolean
+env:
+  LATEST_TAG: ""
+  VERSION_TAG: ""
 
 jobs:
   docker-build:
@@ -34,8 +37,8 @@ jobs:
       - name: Set Docker tags
         id: docker-tags
         run: |
-          echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name }}:latest" >> $GITHUB_ENV
-          echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+          echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.image_name }}:latest" >> $GITHUB_ENV
+          echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
 
       - name: Build Docker Image and push
@@ -44,7 +47,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           push: true
-          cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.app_name}}:latest
+          cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ inputs.image_name}}:latest
           tags: |
             ${{ env.LATEST_TAG }}
             ${{ env.VERSION_TAG }}
