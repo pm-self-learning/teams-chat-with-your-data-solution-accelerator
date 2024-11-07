@@ -4,7 +4,7 @@ import {
     SpeechRecognizer,
     AutoDetectSourceLanguageConfig,
   } from "microsoft-cognitiveservices-speech-sdk";
-
+//this is a comment
 const fetchSpeechConfig = async (): Promise<{ token: string, region: string, languages: string[]; }> => {
   try {
     const response = await fetch("/api/speech");
