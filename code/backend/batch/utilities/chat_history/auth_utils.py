@@ -6,7 +6,7 @@ import logging
 def get_authenticated_user_details(request_headers):
     user_object = {}
 
-    # check the headers for the Principal-Id (the guid of the signed in user)
+    # check the headers for the Principal-Id (the guid of the signed in user) - test
     if "X-Ms-Client-Principal-Id" not in request_headers.keys():
         # if it's not, assume we're in development mode and return a default user
         from . import sample_user
