@@ -12,6 +12,9 @@ on:
       push:
         required: true
         type: boolean
+env:
+  LATEST_TAG: ""
+  VERSION_TAG: ""
 
 jobs:
   docker-build:
