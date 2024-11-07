@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'frontend/src/**'
+      - 'code/frontend/src/**'
 permissions:
   contents: read
   id-token: write
