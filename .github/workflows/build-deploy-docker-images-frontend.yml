@@ -11,8 +11,7 @@ permissions:
 
 env:
   IMAGE_NAME: "frontend-app"
-  LATEST_TAG: ""
-  VERSION_TAG: ""
+
 
 jobs:
   build-push-docker-image:
