@@ -10,8 +10,8 @@ on:
           required: true
           type: string
    outputs:
-      container_image_name:
-        value: ${{ jobs.docker-build-push.outputs.container_image_name }}
+      container_image:
+        value: "pmcontainerregaccelerator.azurecr.io/prod_admin-frontend-app:19"
 
 jobs:
   evaluate-environment:
@@ -39,8 +39,9 @@ jobs:
     needs: evaluate-environment
     env:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
+
     outputs:
-      container_image_name: ${{ steps.docker-tags.outputs.container_image_name }}
+      container_image: ${{ steps.image-name.outputs.image }}
 
     environment:
       name: ${{ needs.evaluate-environment.outputs.environment }}
@@ -65,7 +66,7 @@ jobs:
         run: |
           echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:latest" >> $GITHUB_ENV
           echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
-          echo "::set-output name=container_image_name::$VERSION_TAG"
+
 
       - name: Build Docker Image and push
         uses: docker/build-push-action@v6
@@ -77,3 +78,9 @@ jobs:
           tags: |
             ${{ env.LATEST_TAG }}
             ${{ env.VERSION_TAG }}
+
+
+      - name: Set Image name
+        id: image-name
+        run: |
+           echo "::set-output name=image::${{ env.VERSION_TAG }}"

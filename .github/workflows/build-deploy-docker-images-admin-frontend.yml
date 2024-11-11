@@ -25,7 +25,7 @@ jobs:
       environment:
         name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
       env:
-        IMAGE_NAME: ${{ needs.build-push-docker-image.outputs.container_image_name }}
+        IMAGE_NAME: ${{ needs.build-push-docker-image.outputs.container_image }}
 
 
       steps:
