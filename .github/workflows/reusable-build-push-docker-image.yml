@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Evaluate branch and set environment variable
+      - name: Evaluate environment value
         id: set-env
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
@@ -32,7 +32,7 @@ jobs:
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
             echo "::set-output name=environment::dev"
           fi
-      - name: Print environment variable
+      - name: Print environment value
         run: echo "Environment is $ENVIRONMENT"
 
   docker-build-push:
