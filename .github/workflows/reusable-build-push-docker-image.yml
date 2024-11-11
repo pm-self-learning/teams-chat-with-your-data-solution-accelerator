@@ -39,8 +39,8 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
       IMAGE_NAME: "$ENVIRONMENT-${{ inputs.IMAGE_NAME }}"
-      LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${IMAGE_NAME}:latest
-      VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${IMAGE_NAME}:${{ github.run_number }}
+      LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/$IMAGE_NAME:latest
+      VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/$IMAGE_NAME:${{ github.run_number }}
 
     steps:
 
