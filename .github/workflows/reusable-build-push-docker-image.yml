@@ -40,10 +40,6 @@ jobs:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
 
     steps:
-
-      - name: Print LATEST_TAG
-        run: echo $LATEST_TAG
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -62,6 +58,7 @@ jobs:
         run: |
           echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:latest" >> $GITHUB_ENV
           echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+          echo "::set-output name=container_image_name::$VERSION_TAG"
 
       - name: Build Docker Image and push
         uses: docker/build-push-action@v6
