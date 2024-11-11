@@ -6,16 +6,41 @@ on:
       dockerfile:
         required: true
         type: string
+      image_name:
+          required: true
+          type: string
 
 jobs:
+  evaluate-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Evaluate branch and set environment variable
+        id: set-env
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+            echo "::set-output name=environment::prod"
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+            echo "::set-output name=environment::dev"
+          fi
+      - name: Print environment variable
+        run: echo "Environment is $ENVIRONMENT"
   docker-build:
     runs-on: ubuntu-latest
+    needs: evaluate-environment
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+      name: ${{ needs.evaluate-environment.outputs.environment }}
     env:
-      IMAGE_NAME: ${{ vars.IMAGE_NAME }}
-      LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ vars.IMAGE_NAME }}:latest
-      VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}
+      ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
+      IMAGE_NAME: "$ENVIRONMENT-${{ inputs.IMAGE_NAME }}"
+      LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${IMAGE_NAME}:latest
+      VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${IMAGE_NAME}:${{ github.run_number }}
 
     steps:
 
