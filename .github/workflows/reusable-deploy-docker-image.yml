@@ -57,12 +57,24 @@ jobs:
           run: |
               echo "IMAGE_NAME=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
-        - name: Set container settings in Azure
+        - name: Set Azure App Service container settings
+          if: ${{ inputs.deploy_command == 'app-service' }}
           run: |
             az webapp config container set \
               --name ${{ secrets.AZURE_ADMIN_APP_SERVICE_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --container-image-name   ${{ env.IMAGE_NAME}} \
+              --container-image-name   ${{ env.IMAGE_NAME }} \
               --container-registry-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
               --container-registry-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
               --container-registry-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+
+        - name: Set Azure Function App container settings
+          if: ${{ inputs.deploy_command == 'function-app' }}
+          run: |
+            az functionapp config container set \
+              --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --docker-custom-image-name  ${{ env.IMAGE_NAME }} \
+              --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
+              --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
+              --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
