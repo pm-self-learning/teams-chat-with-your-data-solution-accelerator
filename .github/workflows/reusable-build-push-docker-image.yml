@@ -38,11 +38,14 @@ jobs:
       name: ${{ needs.evaluate-environment.outputs.environment }}
     env:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
-      IMAGE_NAME: "$ENVIRONMENT-${{ inputs.IMAGE_NAME }}"
+      IMAGE_NAME: $ENVIRONMENT_${{ inputs.IMAGE_NAME }}
       LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/$IMAGE_NAME:latest
       VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/$IMAGE_NAME:${{ github.run_number }}
 
     steps:
+
+      - name: Print LATEST_TAG
+        run: echo $LATEST_TAG
 
       - name: Checkout code
         uses: actions/checkout@v2
