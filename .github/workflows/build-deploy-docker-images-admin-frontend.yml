@@ -18,7 +18,7 @@ jobs:
   build-push-docker-image:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
-      image_name: ${{ env.IMAGE_NAME }}
+      image_name: ${{ vars.IMAGE_NAME }}
       dockerfile: "docker/Admin.Dockerfile"
       push: true
    secrets:
