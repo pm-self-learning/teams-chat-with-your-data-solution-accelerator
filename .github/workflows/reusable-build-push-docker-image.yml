@@ -38,9 +38,6 @@ jobs:
       name: ${{ needs.evaluate-environment.outputs.environment }}
     env:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
-      IMAGE_NAME: ${ENVIRONMENT}_${{ inputs.image_name }}
-      LATEST_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${IMAGE_NAME}:latest
-      VERSION_TAG: ${{ secrets.AZURE_CONTAINER_REGISTRY }}/$IMAGE_NAME:${{ github.run_number }}
 
     steps:
 
@@ -59,6 +56,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Set Docker tags
+        id: docker-tags
+        run: |
+          echo "LATEST_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.app_name }}:latest" >> $GITHUB_ENV
+          echo "VERSION_TAG=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.app_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Build Docker Image and push
         uses: docker/build-push-action@v6
