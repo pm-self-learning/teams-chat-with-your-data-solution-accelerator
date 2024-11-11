@@ -63,7 +63,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           push: true
-          cache-from: type=registry,ref=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ vars.image_name}}:latest
+          cache-from: type=registry,ref=${{ env.LATEST_TAG }}
           tags: |
             ${{ env.LATEST_TAG }}
             ${{ env.VERSION_TAG }}
