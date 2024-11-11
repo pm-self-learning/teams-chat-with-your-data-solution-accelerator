@@ -9,9 +9,6 @@ on:
       image_name:
           required: true
           type: string
-   outputs:
-      container_image:
-        value: ${{ jobs.docker-build-push.outputs.container_image }}
 
 jobs:
   evaluate-environment:
@@ -41,12 +38,8 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
 
-    outputs:
-      container_image: ${{ steps.image-name.outputs.container_image }}
-
     environment:
       name: ${{ needs.evaluate-environment.outputs.environment }}
-
 
     steps:
       - name: Checkout code
@@ -79,9 +72,3 @@ jobs:
           tags: |
             ${{ env.LATEST_TAG }}
             ${{ env.VERSION_TAG }}
-
-
-      - name: Set Image name
-        id: image-name
-        run: |
-           echo "::set-output name=container_image::${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:${{ github.run_number }}"

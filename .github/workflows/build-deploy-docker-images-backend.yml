@@ -14,32 +14,15 @@ jobs:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
       dockerfile: "docker/Backend.Dockerfile"
+      image_name: "backend-app"
    secrets:
       inherit
 
-  deploy-backend-app:
-      needs: build-push-docker-image
-      runs-on: ubuntu-latest
-      environment:
-        name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
-
-        - name: Azure Login
-          uses: azure/login@v1
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-        - name: Set Azure Function App container settings
-          run: |
-            az functionapp config container set \
-              --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --docker-custom-image-name  ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }} \
-              --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
-              --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
-              --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+  deploy-app:
+    needs: build-push-docker-image
+    uses: ./.github/workflows/reusable-deploy-docker-image.yml
+    with:
+      image_name: "admin-frontend-app"
+      deploy_command: "function-app"
+    secrets:
+      inherit

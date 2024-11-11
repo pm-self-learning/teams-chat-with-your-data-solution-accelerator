@@ -13,33 +13,16 @@ jobs:
   build-push-docker-image:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
-      dockerfile: "docker/Frontend.Dockerfile"
+     dockerfile: "docker/Frontend.Dockerfile"
+     image_name: "frontend-app"
    secrets:
+     inherit
+
+  deploy-app:
+    needs: build-push-docker-image
+    uses: ./.github/workflows/reusable-deploy-docker-image.yml
+    with:
+      image_name: "frontend-app"
+      deploy_command: "app-service"
+    secrets:
       inherit
-
-  deploy-backend-app:
-      needs: build-push-docker-image
-      runs-on: ubuntu-latest
-      environment:
-        name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
-
-        - name: Azure Login
-          uses: azure/login@v1
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-        - name: Set Azure App Service container settings
-          run: |
-            az webapp config container set \
-              --name ${{ secrets.AZURE_APP_SERVICE_NAME }} \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --container-image-name   ${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}  \
-              --container-registry-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
-              --container-registry-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
-              --container-registry-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}

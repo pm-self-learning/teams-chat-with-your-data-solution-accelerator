@@ -19,11 +19,11 @@ jobs:
    secrets:
       inherit
 
-  deploy-backend-app:
-      needs: build-push-docker-image
-      uses: ./.github/workflows/reusable-deploy-docker-image.yml
-      with:
-        image_name: "admin-frontend-app"
-        deploy_command: "app-service"
-      secrets:
-        inherit
+  deploy-app:
+    needs: build-push-docker-image
+    uses: ./.github/workflows/reusable-deploy-docker-image.yml
+    with:
+      image_name: "admin-frontend-app"
+      deploy_command: "app-service"
+    secrets:
+      inherit
