@@ -22,7 +22,7 @@ jobs:
     needs: build-push-docker-image
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
-      image_name: "admin-frontend-app"
+      image_name: "backend-app"
       deploy_command: "function-app"
     secrets:
       inherit
