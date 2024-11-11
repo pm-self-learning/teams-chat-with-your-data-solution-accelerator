@@ -3,15 +3,9 @@ name: Reusable Docker build and push workflow
 on:
   workflow_call:
    inputs:
-      image_name:
-        required: true
-        type: string
       dockerfile:
         required: true
         type: string
-      push:
-        required: true
-        type: boolean
 
 jobs:
   docker-build:
