@@ -41,7 +41,7 @@ jobs:
       ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
 
     outputs:
-      container_image: ${{ steps.image-name.outputs.image }}
+      container_image_name: ${{ steps.docker-tags.outputs.container_image_name }}
 
     environment:
       name: ${{ needs.evaluate-environment.outputs.environment }}
