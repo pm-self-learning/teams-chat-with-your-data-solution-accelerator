@@ -34,14 +34,15 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: evaluate-environment
+    env:
+      ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
 
     outputs:
       image_name: ${{ steps.docker-tags.outputs.container_image_name }}
 
     environment:
       name: ${{ needs.evaluate-environment.outputs.environment }}
-    env:
-      ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
+
 
     steps:
       - name: Checkout code
