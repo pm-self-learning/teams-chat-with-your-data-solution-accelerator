@@ -10,10 +10,6 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  IMAGE_NAME: "admin-frontend-app"
-
-
 jobs:
   build-push-docker-image:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
@@ -28,7 +24,7 @@ jobs:
       needs: build-push-docker-image
       runs-on: ubuntu-latest
       environment:
-        name: ${{ github.ref != 'refs/heads/main' && 'dev' || 'prod' }}
+        name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
 
       steps:
         - name: Checkout code
