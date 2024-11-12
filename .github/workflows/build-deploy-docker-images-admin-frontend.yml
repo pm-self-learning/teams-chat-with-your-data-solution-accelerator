@@ -15,7 +15,8 @@ jobs:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
       dockerfile: "docker/Admin.Dockerfile"
-      image_name: "admin-frontend-app"
+      image_name: ${{ vars.AZURE_ADMIN_APP_SERVICE_IMAGE_NAME }}
+
    secrets:
       inherit
 
@@ -23,7 +24,8 @@ jobs:
     needs: build-push-docker-image
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
-      image_name: "admin-frontend-app"
+      image_name: ${{ vars.AZURE_ADMIN_APP_SERVICE_IMAGE_NAME }}
       deploy_command: "app-service"
+      service_name: ${{ vars.AZURE_ADMIN_APP_SERVICE_NAME }}
     secrets:
       inherit

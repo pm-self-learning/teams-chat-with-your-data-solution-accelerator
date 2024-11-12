@@ -14,7 +14,7 @@ jobs:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
       dockerfile: "docker/Backend.Dockerfile"
-      image_name: "backend-app"
+      image_name: ${{ vars.AZURE_BACKEND_FUNCTION_APP_IMAGE_NAME }}
    secrets:
       inherit
 
@@ -22,7 +22,8 @@ jobs:
     needs: build-push-docker-image
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
-      image_name: "backend-app"
+      image_name: ${{ vars.AZURE_BACKEND_FUNCTION_APP_IMAGE_NAME }}
       deploy_command: "function-app"
+      service_name: ${{ vars.AZURE_BACKEND_FUNCTION_APP_NAME }}
     secrets:
       inherit
