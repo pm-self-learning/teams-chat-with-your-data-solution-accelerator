@@ -59,7 +59,7 @@ jobs:
         - name: Set Image name
           id: image-name
           run: |
-              echo "IMAGE_NAME=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}-${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+              echo "IMAGE_NAME=${{ secrets.AZURE_CONTAINER_REGISTRY }}/${{ env.ENVIRONMENT}}_${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
         - name: Set Azure App Service container settings
           if: ${{ inputs.deploy_command == 'app-service' }}
