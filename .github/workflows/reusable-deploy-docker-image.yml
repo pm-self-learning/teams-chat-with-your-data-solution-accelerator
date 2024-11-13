@@ -56,20 +56,25 @@ jobs:
             tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        - name: Get secrets from Azure Key Vault
-          id: get-secrets
-          uses: azure/get-keyvault-secrets@v1
+        - name: Azure CLI script
+          uses: azure/cli@v2
           with:
-            keyvault: ${{ secrets.AZURE_KEYVAULT_NAME }}
-            secrets: |
-              AZURE-CONTAINER-REGISTRY
-              AZURE-CONTAINER-REGISTRY-USER-NAME
-              AZURE-CONTAINER-REGISTRY-PASSWORD
+              azcliversion: latest
+              inlineScript: |
+
+                az_container_reg=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+                echo "AZURE-CONTAINER-REGISTRY=$az_container_reg" >> $GITHUB_ENV
+
+                az_container_reg_un=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-USER-NAME --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+                echo "AZURE-CONTAINER-REGISTRY-USER-NAME=$az_container_reg_un" >> $GITHUB_ENV
+
+                az_container_reg_pwd=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-PASSWORD --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+                echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
 
         - name: Set Image name
           id: image-name
           run: |
-              echo "IMAGE_NAME=${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+              echo "IMAGE_NAME=${{ env.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
         - name: Set Azure App Service container settings
           if: ${{ inputs.deploy_command == 'app-service' }}
@@ -78,9 +83,9 @@ jobs:
               --name  ${{ inputs.service_name }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --container-image-name   ${{ env.IMAGE_NAME }} \
-              --container-registry-url https://${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY }} \
-              --container-registry-user ${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY-USER-NAME }} \
-              --container-registry-password ${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+              --container-registry-url https://${{ env.AZURE-CONTAINER-REGISTRY }} \
+              --container-registry-user ${{ env.AZURE-CONTAINER-REGISTRY-USER-NAME }} \
+              --container-registry-password ${{ env.AZURE-CONTAINER-REGISTRY-PASSWORD }}
 
         - name: Set Azure Function App container settings
           if: ${{ inputs.deploy_command == 'function-app' }}

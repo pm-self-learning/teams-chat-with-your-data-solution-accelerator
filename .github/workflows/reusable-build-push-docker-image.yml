@@ -52,22 +52,27 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get secrets from Azure Key Vault
-        id: get-secrets
-        uses: azure/get-keyvault-secrets@v1
+      - name: Azure CLI script
+        uses: azure/cli@v2
         with:
-          keyvault: ${{ secrets.AZURE_KEYVAULT_NAME }}
-          secrets: |
-              AZURE-CONTAINER-REGISTRY
-              AZURE-CONTAINER-REGISTRY-USER-NAME
-              AZURE-CONTAINER-REGISTRY-PASSWORD
+          azcliversion: latest
+          inlineScript: |
+
+            az_container_reg=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+            echo "AZURE-CONTAINER-REGISTRY=$az_container_reg" >> $GITHUB_ENV
+
+            az_container_reg_un=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-USER-NAME --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+            echo "AZURE-CONTAINER-REGISTRY-USER-NAME=$az_container_reg_un" >> $GITHUB_ENV
+
+            az_container_reg_pwd=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-PASSWORD --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
+            echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
 
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY }}
-          username: ${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY-USER-NAME }}
-          password: ${{ steps.get-secrets.outputs.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+          registry: ${{ env.AZURE-CONTAINER-REGISTRY }}
+          username: ${{ env.AZURE-CONTAINER-REGISTRY-USER-NAME }}
+          password: ${{ env.AZURE-CONTAINER-REGISTRY-PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -75,8 +80,8 @@ jobs:
       - name: Set Docker tags
         id: docker-tags
         run: |
-          echo "LATEST_TAG=${{ steps.get-secrets.outputs.AZURE_CONTAINER_REGISTRY }}/${{ inputs.image_name }}:latest" >> $GITHUB_ENV
-          echo "VERSION_TAG=${{ steps.get-secrets.outputs.AZURE_CONTAINER_REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+          echo "LATEST_TAG=${{ env.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:latest" >> $GITHUB_ENV
+          echo "VERSION_TAG=${{ env.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
 
       - name: Build Docker Image and push
