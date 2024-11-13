@@ -58,6 +58,7 @@ jobs:
 
         - name: Azure CLI script
           uses: azure/cli@v2
+          id: get-acr-credentials
           with:
               azcliversion: latest
               inlineScript: |
@@ -74,7 +75,7 @@ jobs:
         - name: Set Image name
           id: image-name
           run: |
-              echo "IMAGE_NAME=${{ env.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+              echo "IMAGE_NAME=${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
 
         - name: Set Azure App Service container settings
           if: ${{ inputs.deploy_command == 'app-service' }}
@@ -83,9 +84,9 @@ jobs:
               --name  ${{ inputs.service_name }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --container-image-name   ${{ env.IMAGE_NAME }} \
-              --container-registry-url https://${{ env.AZURE-CONTAINER-REGISTRY }} \
-              --container-registry-user ${{ env.AZURE-CONTAINER-REGISTRY-USER-NAME }} \
-              --container-registry-password ${{ env.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+              --container-registry-url https://${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY }} \
+              --container-registry-user ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-USER-NAME }} \
+              --container-registry-password ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-PASSWORD }}
 
         - name: Set Azure Function App container settings
           if: ${{ inputs.deploy_command == 'function-app' }}

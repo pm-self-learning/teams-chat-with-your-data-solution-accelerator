@@ -53,26 +53,27 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Azure CLI script
+        id: get-acr-credentials
         uses: azure/cli@v2
         with:
           azcliversion: latest
           inlineScript: |
 
             az_container_reg=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-            echo "AZURE-CONTAINER-REGISTRY=$az_container_reg" >> $GITHUB_ENV
+            echo "::set-output name=AZURE-CONTAINER-REGISTRY::$az_container_reg"
 
             az_container_reg_un=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-USER-NAME --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-            echo "AZURE-CONTAINER-REGISTRY-USER-NAME=$az_container_reg_un" >> $GITHUB_ENV
+            echo "::set-output name=AZURE-CONTAINER-REGISTRY-USER-NAME::$az_container_reg_un"
 
             az_container_reg_pwd=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-PASSWORD --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-            echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
+             echo "::set-output name=AZURE-CONTAINER-REGISTRY-PASSWORD::$az_container_reg_pwd"
 
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.AZURE-CONTAINER-REGISTRY }}
-          username: ${{ env.AZURE-CONTAINER-REGISTRY-USER-NAME }}
-          password: ${{ env.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+          registry: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY }}
+          username: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-USER-NAME }}
+          password: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
