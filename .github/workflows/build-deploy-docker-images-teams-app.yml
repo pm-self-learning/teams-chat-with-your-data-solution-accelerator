@@ -14,7 +14,7 @@ jobs:
   build-push-docker-image:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
-      dockerfile: "extensions/teams/teamsWeb.Dockerfile"
+      dockerfile: "docker/teamsWeb.Dockerfile"
       image_name: "teams-app"
 
    secrets:
