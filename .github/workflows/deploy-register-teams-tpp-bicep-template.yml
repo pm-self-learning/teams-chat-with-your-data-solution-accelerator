@@ -29,4 +29,4 @@ jobs:
       run: |
         az deployment group create \
           --resource-group rg-teamsaccelerator-1 --template-file extensions/teams/infra/azure.bicep \
-          --parameters resourceBaseName='codewith-TeamsApp' botAadAppClientId='869b89bd-30a2-4376-a248-ed64443bd0b5' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
+          --parameters resourceBaseName='codewith-TeamsApp' botAadAppClientId='1bc0f307-7c03-4480-87bd-d6c9b94d4f6b' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
