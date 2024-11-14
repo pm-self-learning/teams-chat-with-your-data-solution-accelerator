@@ -60,13 +60,16 @@ jobs:
           inlineScript: |
 
             az_container_reg=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-            echo "::set-output name=AZURE-CONTAINER-REGISTRY::$az_container_reg"
+            echo "::add-mask::$az_container_reg"
+            echo "AZURE-CONTAINER-REGISTRY=$az_container_reg" >> $GITHUB_ENV
 
             az_container_reg_un=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-USER-NAME --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-            echo "::set-output name=AZURE-CONTAINER-REGISTRY-USER-NAME::$az_container_reg_un"
+            echo "::add-mask::$az_container_reg_un"
+            echo "AZURE-CONTAINER-REGISTRY-USER-NAME=$az_container_reg_un" >> $GITHUB_ENV
 
             az_container_reg_pwd=$(az keyvault secret show --name AZURE-CONTAINER-REGISTRY-PASSWORD --vault-name ${{ secrets.AZURE_KEYVAULT_NAME }} --query value -o tsv)
-             echo "::set-output name=AZURE-CONTAINER-REGISTRY-PASSWORD::$az_container_reg_pwd"
+            echo "::add-mask::$az_container_reg_pwd"
+            echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
 
       - name: Docker Login
         uses: docker/login-action@v3
