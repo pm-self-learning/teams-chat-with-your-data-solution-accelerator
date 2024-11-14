@@ -4,9 +4,9 @@ EXPOSE 80
 WORKDIR /usr/app
 
 ENV NODE_ENV=development
-COPY ["package*.json", "./"]
+COPY ["./extensions/teams/package*.json", "./"]
 RUN npm install && mv node_modules ../
-COPY . .
+COPY ./extensions/teams/. .
 RUN chown -R node /usr/app
 USER node
 CMD ["npm", "run", "dev"]
