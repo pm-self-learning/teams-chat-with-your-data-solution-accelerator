@@ -74,9 +74,9 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY }}
-          username: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-USER-NAME }}
-          password: ${{ steps.get-acr-credentials.outputs.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+          registry: ${{ env.AZURE-CONTAINER-REGISTRY }}
+          username: ${{ env.AZURE-CONTAINER-REGISTRY-USER-NAME }}
+          password: ${{ env.AZURE-CONTAINER-REGISTRY-PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
