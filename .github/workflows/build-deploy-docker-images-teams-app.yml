@@ -1,0 +1,31 @@
+name: Teams App - Build and Deploy Docker Image
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'extensions/teams/**'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-push-docker-image:
+   uses: ./.github/workflows/reusable-build-push-docker-image.yml
+   with:
+      dockerfile: "extensions/teams/teamsWeb.Dockerfile"
+      image_name: "teams-app"
+
+   secrets:
+      inherit
+
+  deploy-app:
+    needs: build-push-docker-image
+    uses: ./.github/workflows/reusable-deploy-docker-image.yml
+    with:
+      image_name: "teams-app"
+      deploy_command: "app-service"
+      service_name:
+    secrets:
+      inherit
