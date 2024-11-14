@@ -14,7 +14,7 @@ jobs:
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
      dockerfile: "docker/Frontend.Dockerfile"
-     image_name: ${{ vars.AZURE_APP_SERVICE_IMAGE_NAME }}
+     image_name: "frontend-app"
    secrets:
      inherit
 
@@ -22,8 +22,8 @@ jobs:
     needs: build-push-docker-image
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
-      image_name: ${{ vars.AZURE_APP_SERVICE_IMAGE_NAME }}
+      image_name: "frontend-app"
       deploy_command: "app-service"
-      service_name: ${{ vars.AZURE_APP_SERVICE_NAME }}
+      service_name: "web-ksbpfhwkprcay-docker"
     secrets:
       inherit
