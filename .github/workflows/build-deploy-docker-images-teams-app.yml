@@ -26,6 +26,6 @@ jobs:
     with:
       image_name: "teams-app"
       deploy_command: "app-service"
-      service_name:
+      service_name: "codewith-TeamsApp"
     secrets:
       inherit
