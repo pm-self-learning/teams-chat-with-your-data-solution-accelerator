@@ -28,6 +28,6 @@ jobs:
     - name: Deploy Bicep template
       run: |
         az deployment group create \
-          --resource-group rg-teamsaccelerator-1 --template-file extensions/teams/azure.bicep \
+          --resource-group rg-teamsaccelerator-1 --template-file extensions/teams/infra/azure.bicep \
 
           --parameters resourceBaseName='codewith-TeamsApp' botAadAppClientId='58fd53b9-066b-4a6b-8350-efb73b244440' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1'
