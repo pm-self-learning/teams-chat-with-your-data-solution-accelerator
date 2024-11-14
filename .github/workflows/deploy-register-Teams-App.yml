@@ -1,4 +1,4 @@
-name: Register Teams App - Deploy Bicep Template
+name: Deploy and Register Teams App (Bicep Template)
 
 on:
     workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  deploy-teams-app:
     environment:
       name: 'prod'
     runs-on: ubuntu-latest
@@ -29,5 +29,5 @@ jobs:
       run: |
         az deployment group create \
           --resource-group rg-teamsaccelerator-1 --template-file .\extensions\teams\azure.bicep \
-          --location uksouth \
+
           --parameters resourceBaseName='codewith-TeamsApp' botAadAppClientId='58fd53b9-066b-4a6b-8350-efb73b244440' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1'
