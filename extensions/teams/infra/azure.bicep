@@ -31,6 +31,9 @@ resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
   sku: {
     name: webAppSKU
   }
+  properties: {
+    reserved: true
+  }
 }
 
 // Web App that hosts your bot
