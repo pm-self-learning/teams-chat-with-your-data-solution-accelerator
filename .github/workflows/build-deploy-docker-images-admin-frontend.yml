@@ -52,6 +52,7 @@ jobs:
 
   deploy-app:
     needs: [build-push-docker-image, copy-acr-image]
+    if: needs.build-push-docker-image.result == 'success' || needs.copy-acr-image.result == 'success'
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
       image_name: "admin-frontend-app"
