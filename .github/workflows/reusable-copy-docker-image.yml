@@ -76,6 +76,8 @@ jobs:
     needs: [get-source-acr-details, get-dest-acr-details]
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Docker Login to source ACR
         uses: docker/login-action@v3
