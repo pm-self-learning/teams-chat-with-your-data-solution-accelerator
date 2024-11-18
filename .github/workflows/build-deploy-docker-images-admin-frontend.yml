@@ -39,6 +39,19 @@ jobs:
       inherit
 
 
+
+  deploy-app:
+    needs: [build-push-docker-image]
+    uses: ./.github/workflows/reusable-deploy-docker-image.yml
+    with:
+      image_name: "admin-frontend-app"
+      deploy_command: "app-service"
+      service_name: "admin-frontend-app"
+      tag_name: ${{ github.run_number }}
+    secrets:
+      inherit
+
+
   # This job runs only when the change is pushed to main branch
   copy-acr-image:
     if: github.ref == 'refs/heads/main'
@@ -47,17 +60,5 @@ jobs:
       image_name: "admin-frontend-app"
       source_environment: "dev"
       destination_environment: "prod"
-    secrets:
-      inherit
-
-  deploy-app:
-    needs: [build-push-docker-image, copy-acr-image]
-    if: needs.build-push-docker-image.result == 'success' || needs.copy-acr-image.result == 'success'
-    uses: ./.github/workflows/reusable-deploy-docker-image.yml
-    with:
-      image_name: "admin-frontend-app"
-      deploy_command: "app-service"
-      service_name: "admin-frontend-app"
-      tag_name: ${{ github.run_number }}
     secrets:
       inherit
