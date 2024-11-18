@@ -8,6 +8,11 @@ on:
             required: true
             default: 'prod'
             type: string
+        teamsAppName:
+              description: 'The name of the Teams App'
+              required: true
+              default: 'codewith-TeamsApp234'
+              type: string
 
 
 permissions:
@@ -36,4 +41,4 @@ jobs:
       run: |
         az deployment group create \
           --resource-group  ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file extensions/teams/infra/azure.bicep \
-          --parameters resourceBaseName='codewith-TeamsApp234' botAadAppClientId='1bc0f307-7c03-4480-87bd-d6c9b94d4f6b' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
+          --parameters resourceBaseName=${{ github.event.inputs.teamsAppName }}  botAadAppClientId='1bc0f307-7c03-4480-87bd-d6c9b94d4f6b' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
