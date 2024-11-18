@@ -1,5 +1,5 @@
 """
-This module contains the code for the Admin app of the Chat with your data Solution Accelerator.
+Description - This module contains the code for the Admin app of the Chat with your data Solution Accelerator.
 """
 
 import os
