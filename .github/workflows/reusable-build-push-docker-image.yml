@@ -16,28 +16,9 @@ on:
           type: string
 
 jobs:
-  evaluate-environment:
-    runs-on: ubuntu-latest
-    outputs:
-      environment: ${{ steps.set-env.outputs.environment }}
-    steps:
-      - name: Evaluate environment value
-        id: set-env
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "environment=prod" >> $GITHUB_OUTPUT
-          else
-            echo "environment=dev" >> $GITHUB_OUTPUT
-          fi
-      - name: Print environment value
-        run: echo "Environment is $environment"
 
   docker-build-push:
     runs-on: ubuntu-latest
-    needs: evaluate-environment
-    environment:
-      name: ${{ needs.evaluate-environment.outputs.environment }}
-
     steps:
       # REFERENCE EXAMPLE - Azure Login and Get ACR credentials from Azure Key Vault steps are here as a reference to get ACR credentials from Key Vault.
       # To use Azure Key Vault, additional setup is required, like giving the identity appropriate access to Azure KV to fetch secrets.
@@ -67,9 +48,14 @@ jobs:
       #       echo "::add-mask::$az_container_reg_pwd"
       #       echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
 
-      - name: Format values
-        run : |
-         echo "SOURCE_ENV=$(echo ${{ needs.evaluate-environment.outputs.environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+      - name: Evaluate environment value
+        id: set-env
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "SOURCE_ENV=PROD" >> $GITHUB_ENV
+          else
+            echo "SOURCE_ENV=DEV" >> $GITHUB_ENV
+          fi
 
       - name: Get ACR details
         run: |
