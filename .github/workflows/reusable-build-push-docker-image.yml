@@ -48,6 +48,9 @@ jobs:
       #       echo "::add-mask::$az_container_reg_pwd"
       #       echo "AZURE-CONTAINER-REGISTRY-PASSWORD=$az_container_reg_pwd" >> $GITHUB_ENV
 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Evaluate environment value
         id: set-env
         run: |
