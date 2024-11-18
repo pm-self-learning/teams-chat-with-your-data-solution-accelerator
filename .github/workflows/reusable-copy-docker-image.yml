@@ -19,6 +19,7 @@ on:
 jobs:
   get-source-acr-details:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.source_environment }}
 
     # outputs:
     #   source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
