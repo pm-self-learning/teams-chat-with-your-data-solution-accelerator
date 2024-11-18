@@ -20,16 +20,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Format input values
+        run : |
+          echo "SOURCE_ENV=$(echo ${{ inputs.source_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+
+          echo "DEST_ENV=$(echo ${{ inputs.destination_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+
       - name: Get Source ACR details
         run: |
-            echo "SOURCE_ENV=$(echo ${{ inputs.source_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-            echo "source_acr=${{ env.SOURCE_ENV  }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
+
+            echo "source_acr=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
             echo "source_acr_un=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
             echo "source_acr_pwd=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
 
       - name: Get Destination ACR details
         run: |
-            echo "DEST_ENV=$(echo ${{ inputs.destination_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+
             echo "dest_acr=${{ env.DEST_ENV  }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
             echo "dest_acr_un=${{ env.DEST_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
             echo "dest_acr_pwd=${{ env.DEST_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
