@@ -34,12 +34,12 @@ jobs:
           inlineScript: |
 
             az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
-            echo "::add-mask::$az_source_acr"
+
             echo "::set-output name=source-acr:$az_source_acr"
             echo "AZ_SOURCE_ACR=$az_source_acr" >> $GITHUB_ENV
 
             az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-            echo "::add-mask::$az_source_acr_un"
+
             echo "::set-output name=source-acr-un:$az_source_acr_un"
             echo "AZ_SOURCE_ACR_UN=$az_source_acr_un" >> $GITHUB_ENV
 
@@ -63,7 +63,7 @@ jobs:
             azcliversion: latest
             inlineScript: |
               az_dest_acr=${{ secrets.AZURE_CONTAINER_REGISTRY }}
-              echo "::add-mask::$az_dest_acr"
+
               echo "::set-output name=dest-acr:$az_dest_acr"
 
               az_dest_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
