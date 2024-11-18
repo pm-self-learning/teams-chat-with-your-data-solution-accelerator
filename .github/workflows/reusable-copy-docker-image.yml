@@ -3,7 +3,6 @@ name: Reusable Docker build and push workflow
 on:
   workflow_call:
    inputs:
-
       image_name:
           required: true
           type: string
@@ -17,25 +16,23 @@ on:
         type: string
 
 jobs:
-  get-source-acr-details:
+  copy-docker-image:
     runs-on: ubuntu-latest
-   # environment: ${{ inputs.source_environment }}
-
-    # outputs:
-    #   source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
-    #   source_acr_user_name: ${{ steps.get-source-acr-credentials.outputs.source_acr_un }}
-    #   source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
     steps:
 
-      - name: Convert source environment to upper case and store in env variable
-        run: echo "SOURCE_ENV=$(echo ${{ inputs.source_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-
-
-      - name: getvariables
+      - name: Get Source ACR details
         run: |
+            echo "SOURCE_ENV=$(echo ${{ inputs.source_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
             echo "source_acr=${{ env.SOURCE_ENV  }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
             echo "source_acr_un=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
             echo "source_acr_pwd=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
+
+      - name: Get Destination ACR details
+        run: |
+            echo "DEST_ENV=$(echo ${{ inputs.destination_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+            echo "dest_acr=${{ env.DEST_ENV  }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
+            echo "dest_acr_un=${{ env.DEST_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
+            echo "dest_acr_pwd=${{ env.DEST_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
 
       - name: Docker Login to source ACR
         uses: docker/login-action@v3
@@ -44,98 +41,23 @@ jobs:
               username: ${{ secrets[env.source_acr_un] }}
               password: ${{ secrets[env.source_acr_pwd]  }}
 
-      - name: Get Source ACR credentials
-        id: get-source-acr-credentials
-
-        uses: azure/cli@v2
-
-        with:
-          azcliversion: latest
-          inlineScript: |
-
-            az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
-            echo "source_acr=$az_source_acr" >> $GITHUB_ENV
-
-            az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-            echo "source_acr_un=$az_source_acr_un" >> $GITHUB_ENV
-
-            az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-            echo "source_acr_pwd=$az_source_acr_pwd" >> $GITHUB_ENV
-
-
-
-      - name: Get Source ACR credentials using GitHub API
-        id: fetch-secrets
-        run: |
-          echo "Fetching secrets for environment: ${{ inputs.source_environment }}"
-          secrets=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/environments/${{ inputs.source_environment }}/secrets)
-          echo "Secrets Metadata: $secrets"
-          echo $secrets | jq -r '.secrets[] | "\(.name)"' >> $GITHUB_ENV
-
-      - name: Print Secret Names
-        run: |
-            echo "Printing fetched secret names..."
-            env | grep -E 'AZURE_CONTAINER_REGISTRY'
 
       - name: Pull Docker image from Source ACR
         run: |
-          docker pull ${{ needs.get-source-acr-details.outputs.source-acr }}/${{ inputs.image_name }}:latest
-
-  get-dest-acr-details:
-      runs-on: ubuntu-latest
-      environment: ${{ inputs.destination_environment }}
-      outputs:
-        dest-acr: ${{ steps.get-dest-acr-credentials.outputs.dest-acr }}
-        dest-acr-user-name: ${{ steps.get-dest-acr-credentials.outputs.dest-acr-un }}
-        dest-acr-password: ${{ steps.get-dest-acr-credentials.outputs.dest-acr-password }}
-      steps:
-        - name: Get Destination ACR credentials
-          id: get-dest-acr-credentials
-          uses: azure/cli@v2
-          with:
-            azcliversion: latest
-            inlineScript: |
-              az_dest_acr=${{ secrets.AZURE_CONTAINER_REGISTRY }}
-              echo "::set-output name=dest-acr::$az_dest_acr"
-
-              az_dest_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-              echo "::set-output name=dest-acr-un::$az_dest_acr_un"
-
-              az_dest_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-              echo "::set-output name=dest-acr-password::$az_dest_acr_pwd"
-
-  docker-copy-image:
-    runs-on: ubuntu-latest
-    needs: [get-source-acr-details, get-dest-acr-details]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Docker Login to source ACR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.source_acr }}
-          username: ${{ env.source_acr_un }}
-          password: ${{ env.source_acr_pwd  }}
-
-      - name: Pull Docker image from Source ACR
-        run: |
-           docker pull ${{ needs.get-source-acr-details.outputs.source-acr }}/${{ inputs.image_name }}:latest
+          docker pull ${{ secrets[env.source_acr] }}/${{ inputs.image_name }}:latest
 
       - name: Tag Docker image for Destination ACR
         run: |
-          docker tag ${{ needs.get-source-acr-details.outputs.source-acr }}/${{ inputs.image_name }}:latest ${{ needs.get-dest-acr-details.outputs.dest-acr }}/${{ inputs.image_name }}:latest
+          docker tag ${{ secrets[env.source_acr] }}/${{ inputs.image_name }}:latest ${{ secrets[env.source_acr] }}/${{ inputs.image_name }}:latest
 
       - name: Docker Login to destination ACR
         uses: docker/login-action@v3
         with:
-            registry: ${{ needs.get-dest-acr-details.outputs.dest-acr }}
-            username: ${{ needs.get-dest-acr-details.outputs.dest-acr-user-name }}
-            password: ${{ needs.get-dest-acr-details.outputs.dest-acr-password }}
+            registry: ${{ secrets[env.dest_acr] }}
+            username: ${{ secrets[env.dest_acr_un] }}
+            password: ${{ secrets[env.dest_acr_pwd]  }}
+
 
       - name: Push Docker image to Destination ACR
         run: |
-          docker push ${{ needs.get-dest-acr-details.outputs.dest-acr }}/${{ inputs.image_name }}:latest
+          docker push ${{ secrets[env.dest_acr] }}/${{ inputs.image_name }}:latest
