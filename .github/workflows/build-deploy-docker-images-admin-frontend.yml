@@ -25,7 +25,7 @@ on:
 permissions:
   contents: read
   id-token: write
-  secrets: read
+
 
 jobs:
   build-push-docker-image:
