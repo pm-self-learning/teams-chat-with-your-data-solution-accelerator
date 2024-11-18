@@ -45,7 +45,12 @@ jobs:
 
             echo "source_acr_pwd=$az_source_acr_pwd" >> $GITHUB_ENV
 
-
+      - name: Docker Login to source ACR
+        uses: docker/login-action@v3
+        with:
+              registry: ${{ env.source_acr }}
+              username: ${{ env.source_acr_un }}
+              password: ${{ env.source_acr_pwd  }}
   get-dest-acr-details:
       runs-on: ubuntu-latest
       environment: ${{ inputs.destination_environment }}
