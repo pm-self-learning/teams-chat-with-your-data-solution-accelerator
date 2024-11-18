@@ -19,7 +19,7 @@ on:
 jobs:
   get-source-acr-details:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.source_environment }}
+
     # outputs:
     #   source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
     #   source_acr_user_name: ${{ steps.get-source-acr-credentials.outputs.source_acr_un }}
@@ -34,15 +34,12 @@ jobs:
           inlineScript: |
 
             az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
-
             echo "source_acr=$az_source_acr" >> $GITHUB_ENV
 
             az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-
             echo "source_acr_un=$az_source_acr_un" >> $GITHUB_ENV
 
             az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-
             echo "source_acr_pwd=$az_source_acr_pwd" >> $GITHUB_ENV
 
       - name: Docker Login to source ACR
@@ -51,6 +48,26 @@ jobs:
               registry: ${{ env.source_acr }}
               username: ${{ env.source_acr_un }}
               password: ${{ env.source_acr_pwd  }}
+
+      - name: Get Source ACR credentials using GitHub API
+        id: fetch-secrets
+        run: |
+          echo "Fetching secrets for environment: ${{ github.event.inputs.source_environment }}"
+          secrets=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/environments/${{ github.event.inputs.source_environment }}/secrets)
+          echo "Secrets Metadata: $secrets"
+          echo $secrets | jq -r '.secrets[] | "\(.name)"' >> $GITHUB_ENV
+
+      - name: Print Secret Names
+        run: |
+            echo "Printing fetched secret names..."
+            env | grep -E 'AZURE_CONTAINER_REGISTRY'
+
+      - name: Pull Docker image from Source ACR
+        run: |
+          docker pull ${{ needs.get-source-acr-details.outputs.source-acr }}/${{ inputs.image_name }}:latest
+
   get-dest-acr-details:
       runs-on: ubuntu-latest
       environment: ${{ inputs.destination_environment }}
