@@ -36,14 +36,17 @@ jobs:
             az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
             echo "::add-mask::$az_source_acr"
             echo "::set-output name=source-acr:$az_source_acr"
+            echo "AZ_SOURCE_ACR=$az_source_acr" >> $GITHUB_ENV
 
             az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
             echo "::add-mask::$az_source_acr_un"
             echo "::set-output name=source-acr-un:$az_source_acr_un"
+            echo "AZ_SOURCE_ACR_UN=$az_source_acr_un" >> $GITHUB_ENV
 
             az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
             echo "::add-mask::$az_source_acr_pwd"
             echo "::set-output name=source-acr-password:$az_source_acr_pwd"
+            echo "AZ_SOURCE_ACR_PWD=$az_source_acr_pwd" >> $GITHUB_ENV
 
   get-dest-acr-details:
       runs-on: ubuntu-latest
@@ -76,15 +79,14 @@ jobs:
     needs: [get-source-acr-details, get-dest-acr-details]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+
 
       - name: Docker Login to source ACR
         uses: docker/login-action@v3
         with:
-          registry: ${{ needs.get-source-acr-details.outputs.source-acr }}
-          username: ${{ needs.get-source-acr-details.outputs.source-acr-user-name }}
-          password: ${{ needs.get-source-acr-details.outputs.source-acr-password }}
+          registry: ${{ env.AZ_SOURCE_ACR }}
+          username: ${{ env.AZ_SOURCE_ACR_UN }}
+          password: ${{ env.AZ_SOURCE_ACR_PWD }}
 
       - name: Pull Docker image from Source ACR
         run: |
