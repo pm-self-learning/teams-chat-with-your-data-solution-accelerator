@@ -27,11 +27,15 @@ jobs:
     #   source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
     steps:
 
+      - name: Convert source environment to upper case and store in env variable
+        run: echo "SOURCE_ENV=$(echo ${{ inputs.source_environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+
+
       - name: getvariables
         run: |
-            echo "source_acr=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY" | tr '[:lower:]' '[:upper:]' >> $GITHUB_ENV
-            echo "source_acr_un=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY_USER_NAME" | tr '[:lower:]' '[:upper:]' >> $GITHUB_ENV
-            echo "source_acr_pwd=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY_PASSWORD" | tr '[:lower:]' '[:upper:]' >> $GITHUB_ENV
+            echo "source_acr=${{ env.SOURCE_ENV  }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
+            echo "source_acr_un=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
+            echo "source_acr_pwd=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
 
       - name: Docker Login to source ACR
         uses: docker/login-action@v3
