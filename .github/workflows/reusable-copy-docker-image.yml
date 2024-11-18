@@ -77,9 +77,12 @@ jobs:
 
     steps:
 
-      - name: Login to Source ACR
-        run: |
-         echo ${{ needs.get-source-acr-details.outputs.source-acr-password }} | docker login ${{ needs.get-source-acr-details.outputs.source-acr }} -u ${{ needs.get-source-acr-details.outputs.source-acr-user-name }} --password-stdin
+      - name: Docker Login to source ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ needs.get-source-acr-details.outputs.source-acr }}
+          username: ${{ needs.get-source-acr-details.outputs.source-acr-user-name }}
+          password: ${{ needs.get-source-acr-details.outputs.source-acr-password }}
 
       - name: Pull Docker image from Source ACR
         run: |
@@ -89,10 +92,12 @@ jobs:
         run: |
           docker tag ${{ needs.get-source-acr-details.outputs.source-acr }}/${{ inputs.image_name }}:latest ${{ needs.get-dest-acr-details.outputs.dest-acr }}/${{ inputs.image_name }}:latest
 
-      - name: Login to Destination ACR
-        run: |
-          echo ${{ needs.get-dest-acr-details.outputs.dest-acr-password }} | docker login ${{ needs.get-dest-acr-details.outputs.dest-acr }} -u ${{ needs.get-dest-acr-details.outputs.dest-acr-user-name }} --password-stdin
-
+      - name: Docker Login to destination ACR
+        uses: docker/login-action@v3
+        with:
+            registry: ${{ needs.get-dest-acr-details.outputs.dest-acr }}
+            username: ${{ needs.get-dest-acr-details.outputs.dest-acr-user-name }}
+            password: ${{ needs.get-dest-acr-details.outputs.dest-acr-password }}
 
       - name: Push Docker image to Destination ACR
         run: |
