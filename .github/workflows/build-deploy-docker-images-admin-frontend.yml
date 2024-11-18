@@ -34,11 +34,12 @@ jobs:
     with:
       dockerfile: "docker/Admin.Dockerfile"
       image_name: "admin-frontend-app"
+      tag_name: ${{ github.run_number }}
     secrets:
       inherit
 
 
-  # This job runs only when the main branch is pushed
+  # This job runs only when the change is pushed to main branch
   copy-acr-image:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/reusable-copy-docker-image.yml
@@ -50,11 +51,12 @@ jobs:
       inherit
 
   deploy-app:
-    needs: build-push-docker-image
+    needs: [build-push-docker-image, copy-acr-image]
     uses: ./.github/workflows/reusable-deploy-docker-image.yml
     with:
       image_name: "admin-frontend-app"
       deploy_command: "app-service"
       service_name: "admin-frontend-app"
+      tag_name: ${{ github.run_number }}
     secrets:
       inherit

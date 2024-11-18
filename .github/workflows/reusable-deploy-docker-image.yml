@@ -15,6 +15,9 @@ on:
           required: true
           type: string
 
+      tag_name:
+        required: true
+        type: string
 
 jobs:
     evaluate-environment:
@@ -22,21 +25,16 @@ jobs:
         outputs:
           environment: ${{ steps.set-env.outputs.environment }}
         steps:
-          - name: Checkout code
-            uses: actions/checkout@v2
-
           - name: Evaluate environment value
             id: set-env
             run: |
               if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-                echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-                echo "::set-output name=environment::prod"
+                echo "environment=prod" >> $GITHUB_OUTPUT
               else
-                echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-                echo "::set-output name=environment::dev"
+                echo "environment=dev" >> $GITHUB_OUTPUT
               fi
           - name: Print environment value
-            run: echo "Environment is $ENVIRONMENT"
+            run: echo "Environment is $environment"
 
     get-service-name:
         runs-on: ubuntu-latest
@@ -46,60 +44,77 @@ jobs:
         outputs:
             service_name: ${{ steps.set-service-name.outputs.service_name }}
         steps:
-            - name: Set service name
-              id: set-service-name
-              run: |
+          - name: Format values
+            run : |
+              echo "SOURCE_ENV=$(echo ${{ needs.evaluate-environment.outputs.environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+
+          - name: Get ACR details
+            run: |
+               echo "AZURE_BACKEND_FUNCTION_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_BACKEND_FUNCTION_APP_NAME"  >> $GITHUB_ENV
+               echo "AZURE_FRONTEND_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_FRONTEND_APP_NAME" >> $GITHUB_ENV
+               echo "AZURE_ADMIN_APP_SERVICE_NAME=${{ env.SOURCE_ENV }}_AZURE_ADMIN_APP_SERVICE_NAME"  >> $GITHUB_ENV
+               echo "TEAMS_APP_NAME=${{ env.SOURCE_ENV }}_TEAMS_APP_NAME"  >> $GITHUB_ENV
+
+          - name: Set service name
+            id: set-service-name
+            run: |
                     if [ "${{ inputs.service_name }}" == "backend-app" ]; then
-                      echo "::set-output name=service_name::${{ secrets.AZURE_BACKEND_FUNCTION_APP_NAME }}"
+                        echo "service_name=${{ secrets[env.AZURE_BACKEND_FUNCTION_APP_NAME] }}" >> $GITHUB_OUTPUT
                     elif [ "${{ inputs.service_name }}" == "frontend-app" ]; then
-                      echo "::set-output name=service_name::${{ secrets.AZURE_FRONTEND_APP_NAME }}"
+                      echo "service_name=${{ secrets[env.AZURE_FRONTEND_APP_NAME] }}" >> $GITHUB_OUTPUT
                     elif [ "${{ inputs.service_name }}" == "admin-frontend-app" ]; then
-                      echo "::set-output name=service_name::${{ secrets.AZURE_ADMIN_APP_SERVICE_NAME }}"
+                      echo "service_name=${{ secrets[env.AZURE_ADMIN_APP_SERVICE_NAME] }}" >> $GITHUB_OUTPUT
                     else [ "${{ inputs.service_name }}" == "teamsApp" ]; then
-                      echo "::set-output name=service_name::${{ secrets.TEAMS_APP_NAME }}"
+                      echo "service_name=${{ secrets[env.TEAMS_APP_NAME] }}" >> $GITHUB_OUTPUT
                     fi
     deploy:
         runs-on: ubuntu-latest
         needs: [evaluate-environment, get-service-name]
-        env:
-            ENVIRONMENT: ${{ needs.evaluate-environment.outputs.environment }}
-
         environment:
             name: ${{ needs.evaluate-environment.outputs.environment }}
         steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
 
-        - name: Azure Login
-          uses: azure/login@v1
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          - name: Format values
+            run : |
+             echo "SOURCE_ENV=$(echo ${{ needs.evaluate-environment.outputs.environment }} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
 
-        - name: Set Image name
-          id: image-name
-          run: |
-              echo "IMAGE_NAME=${{ secrets.AZURE-CONTAINER-REGISTRY }}/${{ inputs.image_name }}:${{ github.run_number }}" >> $GITHUB_ENV
+          - name: Get ACR and RG details
+            run: |
+                echo "AZURE_CONTAINER_REGISTRY=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
+                echo "AZURE_CONTAINER_REGISTRY_USER_NAME=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
+                echo "AZURE_CONTAINER_REGISTRY_PASSWORD=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
+                echo "AZURE_RESOURCE_GROUP=${{ env.SOURCE_ENV }}_AZURE_RESOURCE_GROUP"  >> $GITHUB_ENV
 
-        - name: Set Azure App Service container settings
-          if: ${{ inputs.deploy_command == 'app-service' }}
-          run: |
-            az webapp config container set \
+          - name: Docker Login
+            uses: docker/login-action@v3
+            with:
+              registry: ${{ secrets[env.AZURE_CONTAINER_REGISTRY] }}
+              username: ${{ secrets[env.AZURE_CONTAINER_REGISTRY_USER_NAME] }}
+              password: ${{ secrets[env.AZURE_CONTAINER_REGISTRY_PASSWORD]  }}
+
+          - name: Set Image name
+            id: image-name
+            run: |
+                echo "IMAGE_NAME=${{ secrets[env.AZURE_CONTAINER_REGISTRY] }}/${{ inputs.image_name }}:${{ inputs.tag_name }}" >> $GITHUB_ENV
+
+          - name: Set Azure App Service container settings
+            if: ${{ inputs.deploy_command == 'app-service' }}
+            run: |
+              az webapp config container set \
                 --name  ${{ needs.get-service-name.outputs.service_name }} \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --container-image-name   ${{ env.IMAGE_NAME }} \
-              --container-registry-url https://${{ secrets.AZURE-CONTAINER-REGISTRY }} \
-              --container-registry-user ${{ secrets.AZURE-CONTAINER-REGISTRY-USER-NAME }} \
-              --container-registry-password ${{ secrets.AZURE-CONTAINER-REGISTRY-PASSWORD }}
+                --resource-group ${{ secrets[env.AZURE_RESOURCE_GROUP] }} \
+                --container-image-name   ${{ env.IMAGE_NAME }} \
+                --container-registry-url https://${{ secrets[env.AZURE_CONTAINER_REGISTRY] }} \
+                --container-registry-user ${{ secrets[env.AZURE_CONTAINER_REGISTRY_USER_NAME] }} \
+                --container-registry-password ${{ secrets[env.AZURE_CONTAINER_REGISTRY_PASSWORD] }}
 
-        - name: Set Azure Function App container settings
-          if: ${{ inputs.deploy_command == 'function-app' }}
-          run: |
-            az functionapp config container set \
-              --name ${{ needs.get-service-name.outputs.service_name }} \
-              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --docker-custom-image-name  ${{ env.IMAGE_NAME }}  \
-              --docker-registry-server-url https://${{ secrets.AZURE_CONTAINER_REGISTRY }} \
-              --docker-registry-server-user ${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }} \
-              --docker-registry-server-password ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+          - name: Set Azure Function App container settings
+            if: ${{ inputs.deploy_command == 'function-app' }}
+            run: |
+              az functionapp config container set \
+                --name ${{ needs.get-service-name.outputs.service_name }} \
+                --resource-group ${{ secrets[env.AZURE_RESOURCE_GROUP] }} \
+                --docker-custom-image-name  ${{ env.IMAGE_NAME }}  \
+                --docker-registry-server-url https://${{ secrets[env.AZURE_CONTAINER_REGISTRY] }} \
+                --docker-registry-server-user ${{ secrets[env.AZURE_CONTAINER_REGISTRY_USER_NAME] }} \
+                --docker-registry-server-password ${{ secrets[env.AZURE_CONTAINER_REGISTRY_PASSWORD] }}
