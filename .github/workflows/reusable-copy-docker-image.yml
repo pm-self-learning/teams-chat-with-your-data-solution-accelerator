@@ -20,10 +20,10 @@ jobs:
   get-source-acr-details:
     runs-on: ubuntu-latest
     environment: ${{ inputs.source_environment }}
-    outputs:
-      source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
-      source_acr_user_name: ${{ steps.get-source-acr-credentials.outputs.source_acr_un }}
-      source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
+    # outputs:
+    #   source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
+    #   source_acr_user_name: ${{ steps.get-source-acr-credentials.outputs.source_acr_un }}
+    #   source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
     steps:
 
       - name: Get Source ACR credentials
@@ -34,15 +34,15 @@ jobs:
           inlineScript: |
 
             az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
-            echo "::set-output name=source_acr::$az_source_acr"
+
             echo "source_acr=$az_source_acr" >> $GITHUB_ENV
 
             az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-            echo "::set-output name=source_acr_un::$az_source_acr_un"
+
             echo "source_acr_un=$az_source_acr_un" >> $GITHUB_ENV
 
             az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-            echo "::set-output name=source_acr_pwd::$az_source_acr_pwd"
+
             echo "source_acr_pwd=$az_source_acr_pwd" >> $GITHUB_ENV
 
 
