@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.source_environment }}
     outputs:
-      source-acr: ${{ steps.get-source-acr-credentials.outputs.sourceACR }}
-      source-acr-user-name: ${{ steps.get-source-acr-credentials.outputs.sourceACRUN }}
-      source-acr-password: ${{ steps.get-source-acr-credentials.outputs.sourceACRUNPWD }}
+      source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
+      source_acr_user_name: ${{ steps.get-source-acr-credentials.outputs.source_acr_un }}
+      source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
     steps:
 
       - name: Get Source ACR credentials
@@ -34,13 +34,13 @@ jobs:
           inlineScript: |
 
             az_source_acr=${{  secrets.AZURE_CONTAINER_REGISTRY }}
-            echo "::set-output name=sourceACR::$az_source_acr"
+            echo "::set-output name=source_acr::$az_source_acr"
 
             az_source_acr_un=${{ secrets.AZURE_CONTAINER_REGISTRY_USER_NAME }}
-            echo "::set-output name=sourceACRUN::$az_source_acr_un"
+            echo "::set-output name=source_acr_un::$az_source_acr_un"
 
             az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
-            echo "::set-output name=sourceACRUNPWD::$az_source_acr_pwd"
+            echo "::set-output name=source_acr_pwd::$az_source_acr_pwd"
 
 
   get-dest-acr-details:
@@ -77,9 +77,9 @@ jobs:
       - name: Docker Login to source ACR
         uses: docker/login-action@v3
         with:
-          registry: ${{ needs.get-source-acr-details.outputs.source-acr }}
-          username: ${{ needs.get-source-acr-details.outputs.source-acr-user-name }}
-          password: ${{ needs.get-source-acr-details.outputs.source-acr-password  }}
+          registry: ${{ needs.get-source-acr-details.outputs.source_acr }}
+          username: ${{ needs.get-source-acr-details.outputs.source_acr_user_name }}
+          password: ${{ needs.get-source-acr-details.outputs.source_acr_password  }}
 
       - name: Pull Docker image from Source ACR
         run: |
