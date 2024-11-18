@@ -19,7 +19,7 @@ on:
 jobs:
   get-source-acr-details:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.source_environment }}
+   # environment: ${{ inputs.source_environment }}
 
     # outputs:
     #   source_acr: ${{ steps.get-source-acr-credentials.outputs.source_acr }}
@@ -27,9 +27,24 @@ jobs:
     #   source_acr_password: ${{ steps.get-source-acr-credentials.outputs.source_acr_pwd }}
     steps:
 
+      - name: getvariables
+        run: |
+          echo "source_acr=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY" >> $GITHUB_ENV
+          echo "source_acr_un=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
+          echo "source_acr_pwd=${{ inputs.source_environment }}_AZURE_CONTAINER_REGISTRY_PASSWORD" >> $GITHUB_ENV
+
+      - name: Docker Login to source ACR
+        uses: docker/login-action@v3
+        with:
+              registry: ${{ env.source_acr }}
+              username: ${{ env.source_acr_un }}
+              password: ${{ env.source_acr_pwd  }}
+
       - name: Get Source ACR credentials
         id: get-source-acr-credentials
+
         uses: azure/cli@v2
+
         with:
           azcliversion: latest
           inlineScript: |
@@ -43,12 +58,7 @@ jobs:
             az_source_acr_pwd=${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
             echo "source_acr_pwd=$az_source_acr_pwd" >> $GITHUB_ENV
 
-      - name: Docker Login to source ACR
-        uses: docker/login-action@v3
-        with:
-              registry: ${{ env.source_acr }}
-              username: ${{ env.source_acr_un }}
-              password: ${{ env.source_acr_pwd  }}
+
 
       - name: Get Source ACR credentials using GitHub API
         id: fetch-secrets
