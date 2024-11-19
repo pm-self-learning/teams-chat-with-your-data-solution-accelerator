@@ -61,7 +61,7 @@ jobs:
                       echo "service_name=${{ secrets[env.AZURE_FRONTEND_APP_NAME] }}" >> $GITHUB_ENV
                     elif [ "${{ inputs.service_name }}" == "admin-frontend-app" ]; then
                       echo "service_name=${{ secrets[env.AZURE_ADMIN_APP_SERVICE_NAME] }}" >> $GITHUB_ENV
-                    elif [ "${{ inputs.service_name }}" == "teamsApp" ]; then
+                    elif [ "${{ inputs.service_name }}" == "teams-app" ]; then
                       echo "service_name=${{ secrets[env.TEAMS_APP_NAME] }}" >> $GITHUB_ENV
                     else
                       echo "service_name=unknown" >> $GITHUB_ENV
