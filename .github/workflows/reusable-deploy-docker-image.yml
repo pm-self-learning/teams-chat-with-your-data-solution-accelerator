@@ -20,44 +20,9 @@ on:
         type: string
 
 jobs:
-    get-service-name:
-        runs-on: ubuntu-latest
-        outputs:
-            service_name: ${{ steps.set-service-name.outputs.service_name }}
-        steps:
-          - name: Evaluate environment value
-            id: set-env
-            run: |
-              if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-                echo "SOURCE_ENV=PROD" >> $GITHUB_ENV
-              else
-                echo "SOURCE_ENV=DEV" >> $GITHUB_ENV
-              fi
 
-          - name: Get ACR details
-            run: |
-               echo "AZURE_BACKEND_FUNCTION_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_BACKEND_FUNCTION_APP_NAME"  >> $GITHUB_ENV
-               echo "AZURE_FRONTEND_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_FRONTEND_APP_NAME" >> $GITHUB_ENV
-               echo "AZURE_ADMIN_APP_SERVICE_NAME=${{ env.SOURCE_ENV }}_AZURE_ADMIN_APP_SERVICE_NAME"  >> $GITHUB_ENV
-               echo "TEAMS_APP_NAME=${{ env.SOURCE_ENV }}_TEAMS_APP_NAME"  >> $GITHUB_ENV
-
-          - name: Set service name
-            id: set-service-name
-            run: |
-                    if [ "${{ inputs.service_name }}" == "backend-app" ]; then
-                        echo "service_name=${{ secrets[env.AZURE_BACKEND_FUNCTION_APP_NAME] }}" >> $GITHUB_OUTPUT
-                    elif [ "${{ inputs.service_name }}" == "frontend-app" ]; then
-                      echo "service_name=${{ secrets[env.AZURE_FRONTEND_APP_NAME] }}" >> $GITHUB_OUTPUT
-                    elif [ "${{ inputs.service_name }}" == "admin-frontend-app" ]; then
-                      echo "service_name=${{ secrets[env.AZURE_ADMIN_APP_SERVICE_NAME] }}" >> $GITHUB_OUTPUT
-                    elif [ "${{ inputs.service_name }}" == "teamsApp" ]; then
-                      echo "service_name=${{ secrets[env.TEAMS_APP_NAME] }}" >> $GITHUB_OUTPUT
-                    else
-                      echo "service_name=unknown" >> $GITHUB_OUTPUT
-                    fi
     deploy:
         runs-on: ubuntu-latest
-        needs: [get-service-name]
 
         steps:
 
@@ -77,6 +42,21 @@ jobs:
                 echo "AZURE_CONTAINER_REGISTRY_PASSWORD=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
                 echo "AZURE_RESOURCE_GROUP=${{ env.SOURCE_ENV }}_AZURE_RESOURCE_GROUP"  >> $GITHUB_ENV
 
+          - name: Set service name
+            id: set-service-name
+            run: |
+                    if [ "${{ inputs.service_name }}" == "backend-app" ]; then
+                        echo "service_name=${{ secrets[env.AZURE_BACKEND_FUNCTION_APP_NAME] }}" >> $GITHUB_ENV
+                    elif [ "${{ inputs.service_name }}" == "frontend-app" ]; then
+                      echo "service_name=${{ secrets[env.AZURE_FRONTEND_APP_NAME] }}" >> $GITHUB_ENV
+                    elif [ "${{ inputs.service_name }}" == "admin-frontend-app" ]; then
+                      echo "service_name=${{ secrets[env.AZURE_ADMIN_APP_SERVICE_NAME] }}" >> $GITHUB_ENV
+                    elif [ "${{ inputs.service_name }}" == "teamsApp" ]; then
+                      echo "service_name=${{ secrets[env.TEAMS_APP_NAME] }}" >> $GITHUB_ENV
+                    else
+                      echo "service_name=unknown" >> $GITHUB_ENV
+                    fi
+
           - name: Docker Login
             uses: docker/login-action@v3
             with:
@@ -93,7 +73,7 @@ jobs:
             if: ${{ inputs.deploy_command == 'app-service' }}
             run: |
               az webapp config container set \
-                --name  ${{ needs.get-service-name.outputs.service_name }} \
+                --name  ${{ env.service_name }} \
                 --resource-group ${{ secrets[env.AZURE_RESOURCE_GROUP] }} \
                 --container-image-name   ${{ env.IMAGE_NAME }} \
                 --container-registry-url https://${{ secrets[env.AZURE_CONTAINER_REGISTRY] }} \
@@ -104,7 +84,7 @@ jobs:
             if: ${{ inputs.deploy_command == 'function-app' }}
             run: |
               az functionapp config container set \
-                --name ${{ needs.get-service-name.outputs.service_name }} \
+                --name ${{ env.service_name }} \
                 --resource-group ${{ secrets[env.AZURE_RESOURCE_GROUP] }} \
                 --docker-custom-image-name  ${{ env.IMAGE_NAME }}  \
                 --docker-registry-server-url https://${{ secrets[env.AZURE_CONTAINER_REGISTRY] }} \
