@@ -3,6 +3,17 @@ name: Teams App - Build and Deploy Docker Image
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+    paths:
+      - 'extensions/teams/**'
+  pull_request:
+    branches: [main]
+    types:
+        - opened
+        - ready_for_review
+        - reopened
+        - synchronize
     paths:
       - 'extensions/teams/**'
 
@@ -12,11 +23,12 @@ permissions:
 
 jobs:
   build-push-docker-image:
+   if: github.ref != 'refs/heads/main'
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
       dockerfile: "docker/TeamsApp.Dockerfile"
       image_name: "teams-app"
-
+      tag_name: ${{ github.run_number }}
    secrets:
       inherit
 
@@ -26,6 +38,18 @@ jobs:
     with:
       image_name: "teams-app"
       deploy_command: "app-service"
-      service_name: "codewith-TeamsApp"
+      service_name: "teams-app"
+      tag_name: ${{ github.run_number }}
+    secrets:
+      inherit
+
+  # This job runs only when the change is pushed to the main branch
+  copy-acr-image:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/reusable-copy-docker-image.yml
+    with:
+      image_name: "teams-app"
+      source_environment: "dev"
+      destination_environment: "prod"
     secrets:
       inherit

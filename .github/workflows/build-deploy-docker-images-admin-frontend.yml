@@ -52,7 +52,7 @@ jobs:
       inherit
 
 
-  # This job runs only when the change is pushed to main branch
+  # This job runs only when the change is pushed to the main branch
   copy-acr-image:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/reusable-copy-docker-image.yml

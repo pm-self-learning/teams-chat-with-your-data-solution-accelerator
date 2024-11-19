@@ -3,18 +3,33 @@ name: Backend App - Build and Deploy Docker Image
 on:
   workflow_dispatch:
   push:
+    branches:
+        - main
     paths:
       - 'code/backend/batch/**'
+
+  pull_request:
+    branches: [main]
+    types:
+        - opened
+        - ready_for_review
+        - reopened
+        - synchronize
+    paths:
+      - 'code/backend/batch/**'
+
 permissions:
   contents: read
   id-token: write
 
 jobs:
   build-push-docker-image:
+   if: github.ref != 'refs/heads/main'
    uses: ./.github/workflows/reusable-build-push-docker-image.yml
    with:
       dockerfile: "docker/Backend.Dockerfile"
       image_name: "backend-app"
+      tag_name: ${{ github.run_number }}
    secrets:
       inherit
 
@@ -24,6 +39,18 @@ jobs:
     with:
       image_name: "backend-app"
       deploy_command: "function-app"
-      service_name: "backend-ksbpfhwkprcay-docker"
+      service_name: "backend-app"
+      tag_name: ${{ github.run_number }}
+    secrets:
+      inherit
+
+  # This job runs only when the change is pushed to the main branch
+  copy-acr-image:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/reusable-copy-docker-image.yml
+    with:
+      image_name: "backend-app"
+      source_environment: "dev"
+      destination_environment: "prod"
     secrets:
       inherit
