@@ -35,12 +35,17 @@ jobs:
                 echo "SOURCE_ENV=DEV" >> $GITHUB_ENV
               fi
 
-          - name: Get ACR and RG details
+          - name: Get ACR name and other details
             run: |
                 echo "AZURE_CONTAINER_REGISTRY=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY"  >> $GITHUB_ENV
                 echo "AZURE_CONTAINER_REGISTRY_USER_NAME=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_USER_NAME" >> $GITHUB_ENV
                 echo "AZURE_CONTAINER_REGISTRY_PASSWORD=${{ env.SOURCE_ENV }}_AZURE_CONTAINER_REGISTRY_PASSWORD"  >> $GITHUB_ENV
                 echo "AZURE_RESOURCE_GROUP=${{ env.SOURCE_ENV }}_AZURE_RESOURCE_GROUP"  >> $GITHUB_ENV
+
+                echo "AZURE_BACKEND_FUNCTION_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_BACKEND_FUNCTION_APP_NAME"  >> $GITHUB_ENV
+                echo "AZURE_FRONTEND_APP_NAME=${{ env.SOURCE_ENV }}_AZURE_FRONTEND_APP_NAME"  >> $GITHUB_ENV
+                echo "AZURE_ADMIN_APP_SERVICE_NAME=${{ env.SOURCE_ENV }}_AZURE_ADMIN_APP_SERVICE_NAME"  >> $GITHUB_ENV
+                echo "TEAMS_APP_NAME=${{ env.SOURCE_ENV }}_TEAMS_APP_NAME"  >> $GITHUB_ENV
 
           - name: Set service name
             id: set-service-name
