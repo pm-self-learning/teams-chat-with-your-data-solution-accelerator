@@ -14,6 +14,12 @@ on:
               default: 'codewith-TeamsApp234'
               type: string
 
+        resourceGroup:
+            description: 'The name of the resource group'
+            required: true
+            default: 'rg-teamsaccelerator-1'
+            type: string
+
 
 permissions:
   contents: read
@@ -40,5 +46,5 @@ jobs:
     - name: Deploy Bicep template
       run: |
         az deployment group create \
-          --resource-group  ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file extensions/teams/infra/azure.bicep \
+          --resource-group  ${{ github.event.inputs.resourceGroup }} --template-file extensions/teams/infra/azure.bicep \
           --parameters resourceBaseName=${{ github.event.inputs.teamsAppName }}  botAadAppClientId='1bc0f307-7c03-4480-87bd-d6c9b94d4f6b' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
