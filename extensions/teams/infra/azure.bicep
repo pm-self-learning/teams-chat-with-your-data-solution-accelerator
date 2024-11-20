@@ -72,6 +72,24 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           name: 'AZURE_FUNCTION_URL'
           value: azureFunctionURL
         }
+        {
+          name: 'COSMOSDB_CONTAINER_NAME'
+          value: 'state'
+
+        }
+        {
+          name: 'COSMOSDB_DATABASE_NAME'
+          value: 'db_conversation_history'
+        }
+        {
+            name: 'COSMOSDB_ENDPOINT'
+            value: 'https://jjtestcos.documents.azure.com:443/'
+        }
+        {
+            name: 'COSMOSDB_KEY'
+            value: '@Microsoft.KeyVault(SecretUri=https://kv-lliybm23riihe.vault.azure.net/secrets/AZURE-COSMOSDB-ACCOUNT-KEY)'
+        }
+
       ]
       ftpsState: 'FtpsOnly'
     }
