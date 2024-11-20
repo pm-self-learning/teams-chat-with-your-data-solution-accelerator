@@ -19,6 +19,18 @@
     },
     "botDisplayName": {
       "value": "teams-bot-toolkit"
+    },
+    "cosmosDBContainerName": {
+      "value": "state"
+    },
+    "cosmosDBDatabaseName": {
+      "value": "db_conversation_history"
+    },
+    "cosmosDBEndpoint": {
+      "value": "https://jjtestcos.documents.azure.com:443/"
+    },
+    "cosmosDBKEY": {
+      "value": "@Microsoft.KeyVault(SecretUri=https://kv-abc.vault.azure.net/secrets/AZURE-COSMOSDB-ACCOUNT-KEY)"
     }
   }
 }

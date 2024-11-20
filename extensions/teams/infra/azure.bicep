@@ -20,7 +20,16 @@ param webAppSKU string
 param botDisplayName string
 
 param serverfarmsName string = resourceBaseName
+@description('Name of the CosmosDB container')
+param cosmosDBContainerName string
+@description('Endpoint of the CosmosDB')
+param cosmosDBEndpoint string
+@description('Name of the CosmosDB database')
+param cosmosDBDatabaseName string
 param webAppName string = resourceBaseName
+@secure()
+@description('Key of the CosmosDB')
+param cosmosDBKEY string
 param location string = resourceGroup().location
 
 // Compute resources for your Web App
@@ -74,20 +83,19 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'COSMOSDB_CONTAINER_NAME'
-          value: 'state'
-
+          value: cosmosDBContainerName
         }
         {
           name: 'COSMOSDB_DATABASE_NAME'
-          value: 'db_conversation_history'
+          value: cosmosDBDatabaseName
         }
         {
             name: 'COSMOSDB_ENDPOINT'
-            value: 'https://jjtestcos.documents.azure.com:443/'
+            value: cosmosDBEndpoint
         }
         {
             name: 'COSMOSDB_KEY'
-            value: '@Microsoft.KeyVault(SecretUri=https://kv-lliybm23riihe.vault.azure.net/secrets/AZURE-COSMOSDB-ACCOUNT-KEY)'
+            value: cosmosDBKEY
         }
 
       ]
