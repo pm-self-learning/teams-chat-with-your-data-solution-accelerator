@@ -17,7 +17,7 @@ on:
         resourceGroup:
             description: 'The name of the resource group'
             required: true
-            default: 'rg-teamsaccelerator-1'
+            default: 'rg-test-teams-app'
             type: string
 
 
