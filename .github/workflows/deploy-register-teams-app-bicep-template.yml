@@ -48,4 +48,4 @@ jobs:
         az deployment group create \
           --resource-group  ${{ github.event.inputs.resourceGroup }} --template-file extensions/teams/infra/azure.bicep \
           --parameters extensions/teams/infra/azure.parameters.json \
-          --parameters resourceBaseName=${{ github.event.inputs.teamsAppName }}  botAadAppClientId='869b89bd-30a2-4376-a248-ed64443bd0b5' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
+          --parameters resourceBaseName=${{ github.event.inputs.teamsAppName }}  botAadAppClientId='47fdf7c3-9595-45c8-b32a-d79fced2a556' botAadAppClientSecret='test' azureFunctionURL='testfuncurl' webAppSKU='S1' botDisplayName='test-pm-bot'
