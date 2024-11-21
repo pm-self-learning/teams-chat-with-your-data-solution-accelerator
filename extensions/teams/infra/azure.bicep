@@ -20,16 +20,22 @@ param webAppSKU string
 param botDisplayName string
 
 param serverfarmsName string = resourceBaseName
+
 @description('Name of the CosmosDB container')
 param cosmosDBContainerName string
+
 @description('Endpoint of the CosmosDB')
 param cosmosDBEndpoint string
+
 @description('Name of the CosmosDB database')
 param cosmosDBDatabaseName string
+
 param webAppName string = resourceBaseName
+
 @secure()
 @description('Key of the CosmosDB')
 param cosmosDBKEY string
+
 param location string = resourceGroup().location
 
 // Compute resources for your Web App
