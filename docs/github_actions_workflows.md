@@ -15,6 +15,16 @@ This workflow builds and pushes Docker images to Azure Container Registry (ACR).
 - `image_name`: (Required) The name of the Docker image.
 - `tag_name`: (Required) The tag of the Docker image.
 
+**Jobs:**
+- `docker-build-push`: This job performs the following steps:
+  - **Checkout Code**: Checks out the code from the repository.
+  - **Evaluate environment value**: Determines the environment (DEV or PROD) based on the branch on which workflow is being run.
+  - **Get ACR details**: Generates the Azure Container Registry details and stores them as environment variables.
+  - **Docker Login**: Logs in to the Azure Container Registry.
+  - **Set up Docker Buildx**: Sets up Docker Buildx for building multi-platform images.
+  - **Set Docker tags**: Sets the Docker image tags.
+  - **Build Docker Image and push**: Builds the Docker image using the specified Dockerfile and pushes it to the ACR.
+
 ### 2. Reusable Docker Image Deploy Workflow
 
 **File:** `.github/workflows/reusable-deploy-docker-image.yml`
@@ -26,6 +36,16 @@ This workflow is used to deploy Docker images to Azure App Services or Azure Fun
 - `deploy_command`: (Required) The deployment command (`app-service` or `function-app`).
 - `image_name`: (Required) The name of the Docker image.
 - `tag_name`: (Required) The tag of the Docker image.
+
+**Jobs:**
+- `deploy`: This job performs the following steps:
+  - **Evaluate environment value**: Determines the environment (DEV or PROD) based on the branch on which workflow is being run.
+  - **Get ACR name and other details**: Retrieves the Azure Container Registry and other details from the environment variables.
+  - **Set service name**: Sets the service name based on the input `service_name`.
+  - **Azure Login**: Logs in to Azure using the managed identity.
+  - **Set Image name**: Sets the Docker image name.
+  - **Set Azure App Service container settings**: Configures the Azure App Service to use the specified Docker image (if `deploy_command` is `app-service`).
+  - **Set Azure Function App container settings**: Configures the Azure Function App to use the specified Docker image (if `deploy_command` is `function-app`).
 
 ### 3. Reusable Docker Copy Image Workflow
 
