@@ -1,3 +1,4 @@
+name: Self-hosted runner demo
 on:
   workflow_dispatch:
 
