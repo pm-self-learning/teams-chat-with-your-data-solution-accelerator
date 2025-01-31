@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches:
-        - main
+      - main
+      - dev
     paths:
       - 'code/backend/batch/**'
 
   pull_request:
-    branches: [main]
+    branches: [main, dev]
     types:
         - opened
         - ready_for_review
